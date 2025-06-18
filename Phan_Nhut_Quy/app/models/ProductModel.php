@@ -74,10 +74,28 @@ class ProductModel
     }
 
     // Cập nhật sản phẩm
-    public function updateProduct($id, $name, $description, $price, $category_id)
+    public function updateProduct($id, $name, $description, $price, $category_id, $image = null)
     {
-        $query = "UPDATE " . $this->table_name . " SET name=:name,
-                  description=:description, price=:price, category_id=:category_id WHERE id=:id";
+        $errors = [];
+        if (empty($name)) {
+            $errors['name'] = 'Tên sản phẩm không được để trống';
+        }
+        if (empty($description)) {
+            $errors['description'] = 'Mô tả không được để trống';
+        }
+        if (!is_numeric($price) || $price < 0) {
+            $errors['price'] = 'Giá sản phẩm không hợp lệ';
+        }
+        if (count($errors) > 0) {
+            return $errors;
+        }
+
+        // Nếu có ảnh mới, cập nhật cả ảnh; nếu không, giữ nguyên ảnh cũ
+        if ($image !== null && $image !== '') {
+            $query = "UPDATE " . $this->table_name . " SET name=:name, description=:description, price=:price, category_id=:category_id, image=:image WHERE id=:id";
+        } else {
+            $query = "UPDATE " . $this->table_name . " SET name=:name, description=:description, price=:price, category_id=:category_id WHERE id=:id";
+        }
         $stmt = $this->conn->prepare($query);
 
         $name = htmlspecialchars(strip_tags($name));
@@ -90,6 +108,11 @@ class ProductModel
         $stmt->bindParam(':description', $description);
         $stmt->bindParam(':price', $price);
         $stmt->bindParam(':category_id', $category_id);
+
+        if ($image !== null && $image !== '') {
+            $image = htmlspecialchars(strip_tags($image));
+            $stmt->bindParam(':image', $image);
+        }
 
         if ($stmt->execute()) {
             return true;
