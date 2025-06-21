@@ -3,6 +3,7 @@ require_once('app/config/database.php');
 require_once('app/models/ProductModel.php');
 require_once('app/models/CategoryModel.php');
 require_once('app/utils/JWTHandler.php');
+require_once('app/helpers/RoleMiddleware.php'); // Thêm dòng này
 
 class ProductApiController
 {
@@ -54,6 +55,7 @@ return false;
     // Thêm sản phẩm mới
     public function store()
     {
+        RoleMiddleware::requireRole('admin'); // Chỉ admin mới được phép
         header('Content-Type: application/json');
         $data = json_decode(file_get_contents("php://input"), true);
         $name = $data['name'] ?? '';
@@ -87,6 +89,7 @@ return false;
     // Cập nhật sản phẩm theo ID
     public function update($id)
     {
+        RoleMiddleware::requireRole('admin'); // Chỉ admin mới được phép
         header('Content-Type: application/json');
         $data = json_decode(file_get_contents("php://input"), true);
         $name = $data['name'] ?? '';
@@ -119,6 +122,7 @@ return false;
     // Xóa sản phẩm theo ID
     public function destroy($id)
     {
+        RoleMiddleware::requireRole('admin'); // Chỉ admin mới được phép
         header('Content-Type: application/json');
         $result = $this->productModel->deleteProduct($id);
         if ($result) {

@@ -23,11 +23,8 @@ class ProductViewsController
     // Hiển thị danh sách sản phẩm
     public function list()
     {
-        if (!\SessionHelper::isAdmin()) {
-            header('Location: /PHAN_NHUT_QUY/');
-            exit;
-        }
-        // Lấy danh sách sản phẩm từ ProductModel
+        
+        // Đảm bảo không kiểm tra đăng nhập ở đây, ai cũng xem được
         $products = $this->productModel->getProducts();
         $categories = $this->categoryModel->getCategories();
         include 'app/views/api/product/list.php';
@@ -36,6 +33,7 @@ class ProductViewsController
     // Hiển thị chi tiết sản phẩm
     public function show($id)
     {
+        // Đảm bảo không kiểm tra đăng nhập ở đây, ai cũng xem được
         $categories = $this->categoryModel->getCategories();
         $product = $this->productModel->getProductById($id);
         if ($product) {
@@ -96,10 +94,7 @@ class ProductViewsController
     // Hiển thị form sửa sản phẩm
     public function edit($id)
     {
-        if (!\SessionHelper::isAdmin()) {
-            header('Location: /PHAN_NHUT_QUY/');
-            exit;
-        }
+        
         $product = $this->productModel->getProductById($id);
         $categories = $this->categoryModel->getCategories();
         if ($product) {
