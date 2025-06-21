@@ -1,5 +1,4 @@
-<?php
-<!-- filepath: app/views/category/show.php -->
+
 <?php include 'app/views/shares/header.php'; ?>
 <div class="container mt-5">
     <h2 class="mb-4">Chi tiết danh mục</h2>
