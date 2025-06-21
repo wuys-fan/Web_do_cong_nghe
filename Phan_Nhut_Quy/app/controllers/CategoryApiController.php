@@ -2,7 +2,6 @@
 require_once('app/config/database.php');
 require_once('app/models/CategoryModel.php');
 require_once('app/utils/JWTHandler.php');
-require_once('app/helpers/RoleMiddleware.php'); // Thêm dòng này
 
 class CategoryApiController
 {
@@ -60,7 +59,12 @@ class CategoryApiController
     // Thêm danh mục mới (chỉ admin)
     public function store()
     {
-        RoleMiddleware::requireRole('admin');
+        $user = $this->authenticate();
+        if (!$user || ($user['role'] ?? '') !== 'admin') {
+            http_response_code(401);
+            echo json_encode(['message' => 'Unauthorized']);
+            return;
+        }
 
         header('Content-Type: application/json');
         $data = json_decode(file_get_contents("php://input"), true);
@@ -81,7 +85,12 @@ class CategoryApiController
     // Cập nhật danh mục theo ID (chỉ admin)
     public function update($id)
     {
-        RoleMiddleware::requireRole('admin');
+        $user = $this->authenticate();
+        if (!$user || ($user['role'] ?? '') !== 'admin') {
+            http_response_code(401);
+            echo json_encode(['message' => 'Unauthorized']);
+            return;
+        }
 
         header('Content-Type: application/json');
         $data = json_decode(file_get_contents("php://input"), true);
@@ -101,7 +110,12 @@ class CategoryApiController
     // Xóa danh mục theo ID (chỉ admin)
     public function destroy($id)
     {
-        RoleMiddleware::requireRole('admin');
+        $user = $this->authenticate();
+        if (!$user || ($user['role'] ?? '') !== 'admin') {
+            http_response_code(401);
+            echo json_encode(['message' => 'Unauthorized']);
+            return;
+        }
 
         header('Content-Type: application/json');
         $result = $this->categoryModel->deleteCategory($id);
